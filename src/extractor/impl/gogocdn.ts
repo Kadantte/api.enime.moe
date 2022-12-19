@@ -1,7 +1,7 @@
 import * as CryptoJS from 'crypto-js';
 import VideoExtractor from '../extractor';
 import { IVideo } from '../types';
-import axios from '../../helper/request';
+import axios, { proxiedGet } from '../../helper/request';
 
 class GogoCDN extends VideoExtractor {
     protected override serverName = "goload";
@@ -18,7 +18,7 @@ class GogoCDN extends VideoExtractor {
     override extract = async (videoUrl: URL): Promise<IVideo> => {
         this.referer = videoUrl.href;
 
-        const res = await axios.get(videoUrl.href, {
+        const res = await proxiedGet(videoUrl.href, {
             timeout: 5000
         }); // We set timeout here and there so it'll eventually fall back to consumet if both our origin and backup proxy are "banned" (although this likely won't happen because Cloudflare is distributive)
 
@@ -27,7 +27,7 @@ class GogoCDN extends VideoExtractor {
             videoUrl.searchParams.get("id") ?? ""
         );
 
-        const encryptedData = await axios.get(
+        const encryptedData = await proxiedGet(
             `${videoUrl.protocol}//${videoUrl.hostname}/encrypt-ajax.php?${encyptedParams}`,
             {
                 headers: {
