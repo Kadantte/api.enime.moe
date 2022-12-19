@@ -33,14 +33,13 @@ export default class TvdbProvider extends MetaProvider {
             // let $ = cheerio.load(seriesEntryHtml);
             return undefined;
         } else {
-            const { data: seriesEntryHtml, status } = await axios.get(this.tvdbSeriesUrl + tvdb.id, { validateStatus: () => true });
+            const { status, request } = await axios.get(this.tvdbSeriesUrl + tvdb.id, { validateStatus: () => true });
             if (status === 404) return;
 
-            let $ = cheerio.load(seriesEntryHtml);
+            const seriseSlug = request.res.responseUrl.replace(this.tvdbBaseUrl + "/series/", "");
 
             let absolute = tvdb.season === "a";
-            const seasonElement = $(`${absolute ? "#tab-absolute" : "#tab-official"} > ul > .list-group-item[data-number="${absolute ? 1 : tvdb.season}"]`);
-            const url = seasonElement.find("a").first().attr("href");
+            const url = `${this.tvdbBaseUrl}/series/${seriseSlug}/seasons/${absolute ? "absolute" : "official"}/${absolute ? 1 : tvdb.season}`;
 
             if (!url) return;
 
@@ -53,7 +52,7 @@ export default class TvdbProvider extends MetaProvider {
             });
             if (seasonEntryStatus === 404) return;
 
-            $ = cheerio.load(seasonEntryHtml);
+            let $ = cheerio.load(seasonEntryHtml);
 
             const episodes = [];
             $("tbody > tr").each((i, element) => {
@@ -125,7 +124,7 @@ export default class TvdbProvider extends MetaProvider {
 
                 const japaneseTranslation = translation("jpn");
                 const englishTranslation = translation("eng");
-                const thumbnail = $$(".thumbnail > img")?.first()?.attr("src");
+                const thumbnail = $$(".img-responsive")?.first()?.attr("src");
                 let airingTime = $$('a[href^="/on-today/"]')?.first()?.text();
 
                 if (!airingTime?.length) airingTime = undefined;

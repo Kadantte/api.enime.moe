@@ -141,11 +141,9 @@ export default class GogoanimeScraper extends Scraper {
             path: path
         };
     }
-    
     clean(title) {
         return title.replaceAll(/(th|rd|nd|st) (Season)/gmi, "").replaceAll(/\([^\(]*\)$/gmi, "").trimEnd();
     }
-
     name(): string {
         return "Gogoanime";
     }
