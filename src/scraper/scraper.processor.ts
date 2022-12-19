@@ -325,12 +325,11 @@ export default async function (job: Job<ScraperJobData>, cb: DoneCallback) {
 
         performance.mark(`scraper-job-${job.id}-end`);
         Logger.debug(`Finished scraping job, spent ${performance.measure(`scraper-job-${job.id}`, `scraper-job-${job.id}-start`, `scraper-job-${job.id}-end`).duration.toFixed(2)}ms`)
-
-        cb(null, "Done");
     } catch (e) {
         console.log(e)
         cb(e);
     }
 
     await app.close();
+    cb(null, "Done");
 }

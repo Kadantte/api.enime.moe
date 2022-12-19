@@ -1,10 +1,6 @@
 import { CACHE_MANAGER, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import WS from 'ws';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import Source from '../../entity/source.entity';
-import ReconnectingWebSocket from 'reconnecting-websocket';
 import { RedisCache } from '../../redis/redis.interface';
-import * as util from 'util';
 import { RedisClient } from 'redis';
 import axios from 'axios';
 
