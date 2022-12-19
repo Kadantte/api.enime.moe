@@ -1,4 +1,4 @@
-FROM node:18-alpine AS development
+FROM node:18.12.1-alpine3.16 AS development
 
 RUN apk update
 RUN apk add --no-cache tini
@@ -27,7 +27,7 @@ COPY . .
 RUN npm run build
 RUN npm run prisma:generate
 
-FROM node:18-alpine AS production
+FROM node:18.12.1-alpine3.16 AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
