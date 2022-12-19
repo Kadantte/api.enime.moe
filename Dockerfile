@@ -33,6 +33,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 ENV PRODUCTION=true
 ENV PROD=true
+ENV NODE_OPTIONS="--max_old_space_size=8192"
 
 WORKDIR /usr/src/app
 
