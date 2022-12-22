@@ -8,13 +8,13 @@ import DatabaseService from './database/database.service';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as fs from 'fs';
 import path from 'path';
-import { WsAdapter } from '@nestjs/platform-ws';
 
 export const bootstrap = async () => {
   const app = await NestFactory.create<NestFastifyApplication>(
       AppModule,
       new FastifyAdapter({
-        trustProxy: true
+        trustProxy: true,
+        maxParamLength: 1000
       })
   );
   const port = process.env.PORT;
@@ -41,7 +41,6 @@ export const bootstrap = async () => {
   const databaseService: DatabaseService = app.get(DatabaseService);
   await databaseService.enableShutdownHooks(app);
 
-  app.useWebSocketAdapter(new WsAdapter(app));
   app.enableCors();
 
   await app.listen(port || 3000, "0.0.0.0");
