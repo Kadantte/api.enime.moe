@@ -124,7 +124,9 @@ export default class TvdbProvider extends MetaProvider {
 
                 const japaneseTranslation = translation("jpn");
                 const englishTranslation = translation("eng");
-                const thumbnail = $$(".img-responsive")?.first()?.attr("src");
+                let thumbnail = $$(".img-responsive")?.first()?.attr("src");
+                if (thumbnail === "/images/missing/episode.jpg") thumbnail = undefined;
+
                 let airingTime = $$('a[href^="/on-today/"]')?.first()?.text();
 
                 if (!airingTime?.length) airingTime = undefined;
