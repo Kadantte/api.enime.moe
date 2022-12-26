@@ -66,6 +66,7 @@ export default class EpisodeService {
                                 name: true
                             }
                         },
+                        mappings: true,
                         bannerImage: true,
                         coverImage: true
                     }
