@@ -68,8 +68,10 @@ export default class SearchController {
                 OR  ${"%" + query + "%"}    % ANY(synonyms)
                 OR  anime.title->>'english' ILIKE ${"%" + query + "%"}
                 OR  anime.title->>'romaji'  ILIKE ${"%" + query + "%"}
+                OR  anime.title->>'native'  ILIKE ${"%" + query + "%"}
             )
-        `
+        `;
+
         const [count, results] = await this.databaseService.$transaction([
             this.databaseService.$queryRaw`
                 SELECT COUNT(*) FROM anime
