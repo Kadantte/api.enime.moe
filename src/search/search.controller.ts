@@ -81,6 +81,7 @@ export default class SearchController {
                 ORDER BY
                     (CASE WHEN anime.title->>'english' IS NOT NULL THEN similarity(LOWER(anime.title->>'english'), LOWER(${query})) ELSE 0 END,
                     + CASE WHEN anime.title->>'romaji' IS NOT NULL THEN similarity(LOWER(anime.title->>'romaji'), LOWER(${query})) ELSE 0 END,
+                    + CASE WHEN anime.title->>'native' IS NOT NULL THEN similarity(LOWER(anime.title->>'native'), LOWER(${query})) ELSE 0 END,
                     + CASE WHEN synonyms IS NOT NULL THEN most_similar(LOWER(${query}), synonyms) ELSE 0 END)
                         DESC
                 LIMIT    ${perPage}
