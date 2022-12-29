@@ -31,15 +31,24 @@ export default class RecentController {
         required: false,
         description: "How many elements per page should this response have? Minimum: 1, maximum: 100"
     })
+    @ApiQuery({
+        type: String,
+        name: "language",
+        required: false,
+        description: "The language to show up in the listing, use `,` to separate"
+    })
     @ApiResponse({
         status: 200,
         description: "The list of recent episode releases, paginated",
         type: Recent
     })
-    async recent(@Query("page") page: number, @Query("perPage") perPage: number): Promise<Recent> {
+    async recent(@Query("page") page: number, @Query("perPage") perPage: number, @Query("language") language: string): Promise<Recent> {
         if (!page || page <= 0) page = 1;
         if (!perPage || perPage <= 0) perPage = 20;
         perPage = Math.min(100, perPage);
+
+        let filteredLanguages = undefined;
+        if (language) filteredLanguages = language.split(",");
 
         // @ts-ignore
         const recent = await this.episodePaginator<Prisma.Episode, Prisma.EpisodeFindManyArgs>(this.databaseService.episode, {
@@ -57,7 +66,16 @@ export default class RecentController {
             where: {
               sources: {
                   some: {}
-              }
+              },
+              ...(filteredLanguages && {
+                  OR: filteredLanguages.map(filteredLanguage => {
+                      return {
+                          anime: {
+                              countryOfOrigin: filteredLanguage
+                          }
+                      }
+                  })
+              })
             },
             include: {
                 anime: {

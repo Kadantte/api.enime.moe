@@ -9,7 +9,7 @@ import slugify from 'slugify';
 import cuid from 'cuid';
 import { resolve } from 'path';
 import MappingService from '../mapping/mapping.service';
-import Prisma from '@prisma/client';
+import { Prisma, RelationType } from '@prisma/client';
 import MetaService from '../mapping/meta/meta.service';
 import Piscina from 'piscina';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
@@ -86,7 +86,7 @@ export default class InformationService implements OnApplicationBootstrap {
             preloaded: preloaded
         }, { name: "fetchAnilistEdges" });
 
-        const relations = await Promise.all(edges.filter(edge => edge.node.id !== anime.anilistId && edge.node.type === "ANIME" && Prisma.RelationType[edge.relationType]).map(edge => {
+        const relations = await Promise.all(edges.filter(edge => edge.node.id !== anime.anilistId && edge.node.type === "ANIME" && RelationType[edge.relationType]).map(edge => {
             return new Promise((resolve) => {
                 this.fetchAnimeByAnilistID(edge.node.id)
                     .then(relatedAnimeId => {
@@ -258,7 +258,7 @@ export default class InformationService implements OnApplicationBootstrap {
             }
         }
 
-        slugify.extend({"×": "x", "/": "-", "?": "-question", ";": "-"})
+        slugify.extend({"×": "x", "/": "-", "?": "--", ";": "-"})
 
         return {
             title: anilistAnime.title,
@@ -307,29 +307,48 @@ export default class InformationService implements OnApplicationBootstrap {
                     anilistId: anilistId
                 }, { name: "fetchAnilistAnime" })
                     .then(anilistAnime => resolve(anilistAnime))
-                    .catch(error => reject(error))
+                    .catch(error => reject(`${error} - ${anilistId}`))
             })
         }));
 
         for (let anilistAnime of anilistAnimeList) {
             if (!anilistAnime) throw new NotFoundException("Such anime cannot be found from Anilist");
 
-            const animeDbObject = await this.convertToDbAnime(anilistAnime);
+            let animeDbObject = await this.convertToDbAnime(anilistAnime);
 
-            let animeDb = await this.databaseService.anime.upsert({
-                where: {
-                    anilistId: animeDbObject.anilistId
-                },
-                create: {
-                    id: cuid(),
-                    ...animeDbObject
-                },
-                update: {
-                    ...animeDbObject
+            let tryUpdate = async anime => {
+                await this.databaseService.anime.upsert({
+                    where: {
+                        anilistId: animeDbObject.anilistId
+                    },
+                    create: {
+                        id: cuid(),
+                        ...anime
+                    },
+                    update: {
+                        ...anime
+                    }
+                });
+
+                await this.fetchRelations(anime.id, anilistAnime);
+            }
+
+            try {
+                await tryUpdate(animeDbObject);
+            } catch (e) {
+                console.log(e)
+                if (e instanceof Prisma.PrismaClientKnownRequestError) {
+                    if (e.code === "P2002") {
+                        let count = await this.databaseService.anime.count({ where: { slug: animeDbObject.slug }});
+                        animeDbObject = {
+                            ...animeDbObject,
+                            slug: animeDbObject.slug + "-" + String(count)
+                        }
+
+                        await tryUpdate(animeDbObject);
+                    }
                 }
-            });
-
-            await this.fetchRelations(animeDb.id, anilistAnime);
+            }
         }
     }
 
