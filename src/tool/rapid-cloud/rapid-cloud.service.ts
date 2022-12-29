@@ -9,7 +9,7 @@ export default class RapidCloudService implements OnModuleInit {
     public decryptionKey: string;
 
     private readonly redisClient: RedisClient;
-    private readonly decryptionKeyFlow = "https://raw.githubusercontent.com/consumet/rapidclown/main/key.txt";
+    private readonly decryptionKeyFlow = "https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt";
 
     constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: RedisCache) {
         this.redisClient = this.cacheManager.store.getClient();
