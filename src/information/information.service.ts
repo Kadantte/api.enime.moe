@@ -275,6 +275,7 @@ export default class InformationService implements OnApplicationBootstrap {
             season: anilistAnime.season || "UNKNOWN",
             seasonInt: anilistAnime.seasonInt,
             year: anilistAnime.seasonYear,
+            countryOfOrigin: anilistAnime.countryOfOrigin,
             format: anilistAnime.format || "UNKNOWN",
             next: nextEpisode,
             ...(!!mappingObject && {

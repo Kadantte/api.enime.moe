@@ -21,6 +21,7 @@ model Anime {
   currentEpisode    Int?
   next              DateTime?
   synonyms          String[]
+  countryOfOrigin   String?
   lastEpisodeUpdate DateTime?
   seasonInt         Int?
   description       String?
