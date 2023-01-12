@@ -41,13 +41,14 @@ export default class InformationService implements OnApplicationBootstrap {
 
     @OnEvent("anime.refetch", { async: true })
     async handleAnimeRefetchEvent(event: AnimeRefetchEvent) {
+
         if (event.animeIds?.length) await this.addToScrapeQueue(event.animeIds, event.specific ? 1 : 4);
 
         if (event.createdAnimeIds?.length) {
             this.resyncAnime(event.createdAnimeIds).then(() => {
                 Logger.debug("Resync-ed newly created anime(s)");
             }).catch(error => {
-                Logger.error(`Newly created anime(s) failed ot resync: ${error}`);
+                Logger.error(`Newly created anime(s) failed of resync: ${error}`);
             });
         }
     }
@@ -478,7 +479,7 @@ export default class InformationService implements OnApplicationBootstrap {
                             return {
                                 id: animeDb.id,
                                 created: created,
-                                requireUpdate: created || animeDb.currentEpisode !== animeDbObject.currentEpisode
+                                requireUpdate: created || animeDb.currentEpisode !== animeDbObject.currentEpisode || animeDb.episodes.length !== animeDbObject.currentEpisode
                             }
                         }).then(data => {
                             resolve(data);
