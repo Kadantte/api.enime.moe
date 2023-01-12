@@ -117,7 +117,10 @@ export default async function (job: Job<ScraperJobData>, cb: DoneCallback) {
                     }
 
                     //  if (!matchedAnimeEntry) matchedAnimeEntry = await scraperModule.matchAnime(anime.title, scraper);
-                    if (!matchedAnimeEntry) continue;
+                    if (!matchedAnimeEntry) {
+                        Logger.debug(`No matched MalSync entry for the anime ${anime.id}, skipping this scraper job.`);
+                        continue;
+                    }
 
                     lastChecks[scraper.websiteMeta.id] = Date.now();
 
@@ -170,8 +173,10 @@ export default async function (job: Job<ScraperJobData>, cb: DoneCallback) {
                         let scrapedEpisodes = scraper.fetch(matchedAnimeEntry.path, episodeToScrapeLower, episodeToScraperHigher, excludedNumbers);
                         if (scrapedEpisodes instanceof Promise) scrapedEpisodes = await scrapedEpisodes;
 
-                        if (!scrapedEpisodes) continue;
-                        if (Array.isArray(scrapedEpisodes) && !scrapedEpisodes.length) continue;
+                        if ((!scrapedEpisodes) || (Array.isArray(scrapedEpisodes) && !scrapedEpisodes.length)) {
+                            Logger.debug(`No new scraped episodes available for anime ${anime.id}`);
+                            continue;
+                        }
 
                         if (!Array.isArray(scrapedEpisodes)) scrapedEpisodes = [scrapedEpisodes];
 

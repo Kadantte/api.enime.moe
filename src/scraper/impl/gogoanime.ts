@@ -50,7 +50,9 @@ export default class GogoanimeScraper extends Scraper {
     async fetch(path: string, startNumber: number, endNumber: number, excludedNumbers: number[]): Promise<Episode[]> {
         let url = `${this.url()}${path}`;
 
-        let response = this.get(url);
+        let response = await proxiedGet(url, {
+            timeout: 4000
+        });
         let responseText = await (await response).data;
 
         let $ = cheerio.load(responseText);
@@ -58,7 +60,9 @@ export default class GogoanimeScraper extends Scraper {
         const movieId = $("#movie_id").attr("value");
 
         url = `https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=${startNumber}&ep_end=${endNumber}&id=${movieId}`;
-        response = this.get(url);
+        response = await proxiedGet(url, {
+            timeout: 4000
+        });
         responseText = await (await response).data;
 
         $ = cheerio.load(responseText);
@@ -149,7 +153,7 @@ export default class GogoanimeScraper extends Scraper {
     }
 
     url(): string {
-        return "https://gogoanime.ar";
+        return "https://www1.gogoanime.bid";
     }
 
 }

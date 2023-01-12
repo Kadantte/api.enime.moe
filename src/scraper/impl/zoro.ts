@@ -5,7 +5,7 @@ import { Episode, RawSource } from '../../types/global';
 import { clean, removeSpecialChars } from '../../helper/title';
 import { deepMatch } from '../../helper/match';
 import RapidCloud from '../../extractor/impl/rapidcloud';
-import axios from '../../helper/request';
+import axios, { proxiedGet } from '../../helper/request';
 
 export default class Zoro extends Scraper {
     override enabled = true;
@@ -68,9 +68,11 @@ export default class Zoro extends Scraper {
     }
 
     async fetch(path: string, _, __, excludedNumbers: number[]): Promise<Episode[]> {
-        const response = await this.get(`${this.url()}/ajax/v2/episode/list/${path.split("-").pop()}`, {
-            'X-Requested-With': 'XMLHttpRequest',
-            Referer: `${this.url()}/watch${path}`,
+        const response = await proxiedGet(`${this.url()}/ajax/v2/episode/list/${path.split("-").pop()}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                Referer: `${this.url()}/watch${path}`
+            }
         });
 
         const r = (await (await response).data);
