@@ -118,7 +118,8 @@ export default async function (job: Job<ScraperJobData>, cb: DoneCallback) {
 
                     //  if (!matchedAnimeEntry) matchedAnimeEntry = await scraperModule.matchAnime(anime.title, scraper);
                     if (!matchedAnimeEntry) {
-                        Logger.debug(`No matched MalSync entry for the anime ${anime.id}, skipping this scraper job.`);
+                        Logger.debug(`No matched site (${scraper.name()}) entry for the anime ${anime.id}, skipping this scraper job.`);
+                        Logger.debug(malSyncData);
                         continue;
                     }
 
