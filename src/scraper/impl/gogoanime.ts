@@ -33,7 +33,7 @@ export default class GogoanimeScraper extends Scraper {
 
         let $$ = cheerio.load(embedResponseText);
 
-        let embedUrl = $$("iframe").first().attr("src");
+        let embedUrl = $$("iframe").first().attr("src")?.replace('.pro', '.net');
         if (!embedUrl) return undefined;
 
         if (!embedUrl.startsWith("https:")) embedUrl = "https:" + embedUrl;

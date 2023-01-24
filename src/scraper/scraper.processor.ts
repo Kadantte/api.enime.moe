@@ -51,15 +51,17 @@ export default async function (job: Job<ScraperJobData>, cb: DoneCallback) {
                 continue;
             }
 
-            let malSyncData;
+            let malSyncData, malSyncResponse;
 
             // @ts-ignore
             if (anime.mappings.mal) {
                 try {
                     // @ts-ignore
-                    malSyncData = ((await axios.get(`https://api.malsync.moe/mal/anime/${anime.mappings.mal}`, { validateStatus: () => true })).data)?.Sites;
+                    malSyncResponse = ((await axios.get(`https://api.malsync.moe/mal/anime/${anime.mappings.mal}`, { validateStatus: () => true })));
+                    malSyncData = malSyncResponse.data?.Sites;
                 } catch (e) {
                     Logger.error(`Anime ${anime.id} does not have a corresponding MalSync mapping, skipping this anime`);
+                    console.error(malSyncResponse);
                     continue;
                 }
             }
