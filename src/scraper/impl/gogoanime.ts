@@ -60,6 +60,7 @@ export default class GogoanimeScraper extends Scraper {
         const movieId = $("#movie_id").attr("value");
 
         url = `https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=${startNumber}&ep_end=${endNumber}&id=${movieId}`;
+
         response = await proxiedGet(url, {
             timeout: 4000
         });

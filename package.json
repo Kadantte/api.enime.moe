@@ -10,7 +10,7 @@
     "build": "swc --ignore \\\"**/*.spec.ts,src/hmr.ts\\\" --delete-dir-on-start --out-dir dist/ src/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "dev": "cross-env HMR=true node --trace-warnings -r @swc/register src/hmr.ts ",
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=8192 HMR=true node --trace-warnings -r @swc/register src/hmr.ts ",
     "start:prod": "node dist/main",
     "test": "jest",
     "test:watch": "jest --watch",

@@ -9,6 +9,7 @@ import DatabaseService from '../database/database.service';
 import ScraperService from './scraper.service';
 import MetaService from '../mapping/meta/meta.service';
 import axios from 'axios';
+import { proxiedGet } from '../helper/request';
 
 export default async function (job: Job<ScraperJobData>, cb: DoneCallback) {
     const app = await NestFactory.createApplicationContext(ScraperModule);
@@ -57,9 +58,10 @@ export default async function (job: Job<ScraperJobData>, cb: DoneCallback) {
             if (anime.mappings.mal) {
                 try {
                     // @ts-ignore
-                    malSyncResponse = ((await axios.get(`https://api.malsync.moe/mal/anime/${anime.mappings.mal}`, { validateStatus: () => true })));
+                    malSyncResponse = await proxiedGet(`https://api.malsync.moe/mal/anime/${anime.mappings.mal}`);
                     malSyncData = malSyncResponse.data?.Sites;
                 } catch (e) {
+                    console.error(e)
                     Logger.error(`Anime ${anime.id} does not have a corresponding MalSync mapping, skipping this anime`);
                     continue;
                 }
