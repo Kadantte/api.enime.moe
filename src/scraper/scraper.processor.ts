@@ -58,7 +58,7 @@ export default async function (job: Job<ScraperJobData>, cb: DoneCallback) {
             if (anime.mappings.mal) {
                 try {
                     // @ts-ignore
-                    malSyncResponse = await proxiedGet(`https://api.malsync.moe/mal/anime/${anime.mappings.mal}`);
+                    malSyncResponse = await proxiedGet(`https://api.malsync.moe/mal/anime/${anime.mappings.mal}`, { validateStatus: () => true });
                     malSyncData = malSyncResponse.data?.Sites;
                 } catch (e) {
                     console.error(e)
