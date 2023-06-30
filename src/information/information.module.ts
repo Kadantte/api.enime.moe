@@ -109,32 +109,38 @@ export default class InformationModule implements OnApplicationBootstrap {
         });
     }
 
-    @Cron(CronExpression.EVERY_2_HOURS)
+    @Cron("*/30 * * * *")
     async checkForUpdatedEpisodesForAnimeJustFinished() {
         let currentYear = new Date().getFullYear();
         const currentSeason = Math.floor((new Date().getMonth() / 12 * 4)) % 4;
 
         const season = this.seasons[currentSeason];
+
+        this.updateOnCondition({
+            status: {
+                in: ["FINISHED"]
+            },
+            year: currentYear,
+            season: season
+        }, 2).then(() => {
+            Logger.debug("Finished checking updated episodes for releasing anime that just finished");
+        });
+    }
+
+    @Cron(CronExpression.EVERY_2_HOURS)
+    async checkForUpdatedEpisodesForAnimeJustFinishedPrevSeason() {
+        let currentYear = new Date().getFullYear();
+        const currentSeason = Math.floor((new Date().getMonth() / 12 * 4)) % 4;
+
         const previousSeason = currentSeason === 0 ? this.seasons[3] : this.seasons[currentSeason - 1];
         const previousYear = currentSeason === 0 ? currentYear - 1 : currentYear;
 
         this.updateOnCondition({
-            OR: [
-                {
-                    status: {
-                        in: ["FINISHED"]
-                    },
-                    year: currentYear,
-                    season: season
-                },
-                {
-                    status: {
-                        in: ["FINISHED"]
-                    },
-                    year: previousYear,
-                    season: previousSeason
-                }
-            ]
+            status: {
+                in: ["FINISHED"]
+            },
+            year: previousYear,
+            season: previousSeason
         }, 2).then(() => {
             Logger.debug("Finished checking updated episodes for releasing anime that just finished");
         });
@@ -249,6 +255,5 @@ export default class InformationModule implements OnApplicationBootstrap {
     }
 
     async onApplicationBootstrap() {
-        await this.checkForUpdatedEpisodesForAnimeJustFinished();
     }
 }
