@@ -85,6 +85,9 @@ export default class InformationModule implements OnApplicationBootstrap {
         const releasingAnime = await this.databaseService.anime.findMany({
             where: {
                 status: "RELEASING"
+            },
+            select: {
+                id: true
             }
         });
 

@@ -38,6 +38,8 @@ export default class GogoanimeScraper extends Scraper {
 
         if (!embedUrl.startsWith("https:")) embedUrl = "https:" + embedUrl;
 
+        embedUrl = embedUrl.replace("goone.net", "goone.pro");
+
         const video = await (new GogoCDN().extract(new URL(embedUrl)));
 
         return {
@@ -50,6 +52,7 @@ export default class GogoanimeScraper extends Scraper {
     async fetch(path: string, startNumber: number, endNumber: number, excludedNumbers: number[]): Promise<Episode[]> {
         let url = `${this.url()}${path}`;
 
+        console.log(url)
         let response = await proxiedGet(url, {
             timeout: 4000
         });
